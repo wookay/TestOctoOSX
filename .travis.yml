@@ -20,9 +20,11 @@ before_install:
   # linux PostgreSQL 9.6.6
   #- sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION
   # osx
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install postgresql mysql ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services stop postgresql   ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; brew services start postgresql       ; fi
+  #- if [ "$TRAVIS_OS_NAME" == osx ]; then brew install mysql ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services stop  postgresql  ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services start postgresql  ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services stop  mysql       ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services start mysql       ; fi
   - psql --version
   - psql -U postgres -tc 'SHOW server_version'
   - psql -U postgres -c '\conninfo'
