@@ -48,7 +48,10 @@ before_script:
   #- sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION
   # osx
   #- if [ "$TRAVIS_OS_NAME" == osx ]; then brew install mysql ; fi
-  - pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
+  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then rm -rf /usr/local/var/postgres; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then initdb /usr/local/var/postgres; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then pg_ctl -D /usr/local/var/postgres start; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then createuser -s postgres; fi
   - psql --version
   - psql -c "CREATE DATABASE postgresqltest;" -U postgres
   # linux MySQL
