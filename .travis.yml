@@ -3,7 +3,7 @@
 language: julia
 
 services:
- - postgresql
+# - postgresql
  - mysql
 
 sudo: false  # use the new container-based Travis infrastructure
@@ -43,21 +43,14 @@ git:
 
 
 before_script:
-  - export OLD_PATH=$LD_LIBRARY_PATH
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`mysql_config --libs | cut -d ' ' -f1 | sed 's/-L//'`
-  # linux PostgreSQL 9.6.6
-  #- sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION
-  # osx
-  #- if [ "$TRAVIS_OS_NAME" == osx ]; then brew install mysql ; fi
-
-  # Fixes PostgreSQL not starting on OSX. See https://github.com/travis-ci/travis-ci/issues/1875#issuecomment-263847183
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf /usr/local/var/postgres; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then initdb /usr/local/var/postgres; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pg_ctl -D /usr/local/var/postgres start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then until createuser -s postgres; do echo "Postgres is unavailable - sleeping"; sleep 0.05; done; fi
-  - psql --version
-  - psql -c "CREATE DATABASE postgresqltest;" -U postgres
+#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf /usr/local/var/postgres; fi
+#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then initdb /usr/local/var/postgres; fi
+#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pg_ctl -D /usr/local/var/postgres start; fi
+#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then until createuser -s postgres; do echo "Postgres is unavailable - sleeping"; sleep 0.05; done; fi
+#  - psql --version
+#  - psql -c "CREATE DATABASE postgresqltest;" -U postgres
   # linux MySQL
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install   mysql       ; fi
   - mysql --version
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services stop  mysql       ; fi
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services start mysql       ; fi
@@ -69,9 +62,6 @@ script:
   - julia -e 'using Pkg; Pkg.add("DataStreams"); Pkg.checkout("DataStreams", "master"); using DataStreams' # for MySQL.jl
   - julia --depwarn=no -e 'using Pkg; Pkg.clone("https://github.com/wookay/Octo.jl.git"); Pkg.test("Octo")'
 
-after_script:
-  - export LD_LIBRARY_PATH=$OLD_PATH
-  - unset OLD_PATH
 
 after_success:
   # push coverage results to Coveralls
