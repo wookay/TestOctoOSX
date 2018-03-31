@@ -52,7 +52,6 @@ before_script:
   # linux MySQL
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install   mysql       ; fi
   - mysql --version
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services stop  mysql       ; fi
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services start mysql       ; fi
   - mysql -e 'show variables like "socket";' -uroot
   - mysql -e 'CREATE DATABASE mysqltest;' -uroot
