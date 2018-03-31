@@ -7,14 +7,11 @@ services:
  - mysql
 
 os:
-#  - linux
+  - linux
   - osx
 
 julia:
   - nightly
-
-addons:
-  postgresql: "9.6"
 
 matrix:
   allow_failures:
@@ -27,42 +24,37 @@ notifications:
 git:
   depth: 99999999
 
-## uncomment the following lines to allow failures on nightly julia
-## (tests will run but not make your overall status red)
-#matrix:
-#  allow_failures:
-#  - julia: nightly
-
-## uncomment and modify the following lines to manually install system packages
-#addons:
-#  apt: # apt-get for linux
-#    packages:
-#    - gfortran
-
-
 before_script:
-  # osx
-  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then rm -rf /usr/local/var/postgres; fi
-  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then initdb /usr/local/var/postgres; fi
-  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then pg_ctl -D /usr/local/var/postgres start; fi
-  - if [[ "$TRAVIS_OS_NAME" == osx ]]; then until createuser -s postgres; do echo "Postgres is unavailable - sleeping"; sleep 0.05; done; fi
-  - psql --version
+  # linux - PostgreSQL
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION               ; fi
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then psql --version                                                                                  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then psql -U postgres -tc 'SHOW server_version'                                                      ; fi
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then psql -U postgres -c '\conninfo'                                                                 ; fi
+  # linux - MySQL
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then mysql -e 'show variables like "socket";' -uroot                                                 ; fi
+  # osx   - PostgreSQL
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then rm -rf /usr/local/var/postgres                                                                  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then initdb /usr/local/var/postgres                                                                  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then pg_ctl -D /usr/local/var/postgres start                                                         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then until createuser -s postgres; do echo "Postgres is unavailable - sleeping"; sleep 0.05; done    ; fi
+  # osx   - MySQL
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then brew install   mysql                                                                            ; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then brew services start mysql                                                                       ; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then mysql.server start                                                                              ; fi
+  - if [[ "$TRAVIS_OS_NAME" == osx   ]]; then sleep 0.1                                                                                       ; fi
   - psql -c "CREATE DATABASE postgresqltest;" -U postgres
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install   mysql                                                                          ; fi
+  - psql --version
+  - mysql -e 'CREATE DATABASE mysqltest;' -uroot
+  - mysql -e 'GRANT ALL PRIVILEGES ON mysqltest.* TO "root"@"localhost" IDENTIFIED BY ""' -uroot
   - mysql --version
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services start mysql                                                                     ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql.server start                                                                            ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then sleep 0.1                                                                                     ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql -e 'CREATE DATABASE mysqltest;' -uroot                                                  ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql -e 'GRANT ALL PRIVILEGES ON mysqltest.* TO "root"@"localhost" IDENTIFIED BY ""' -uroot  ; fi
 
 script:
   - julia -e 'using Pkg; Pkg.add("DataStreams"); Pkg.checkout("DataStreams", "master"); using DataStreams' # for MySQL.jl
+  #- julia --depwarn=no -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("Octo"); Pkg.test("Octo"; coverage=true)'
   - julia --depwarn=no -e 'using Pkg; Pkg.clone("https://github.com/wookay/Octo.jl.git"); Pkg.test("Octo")'
-
 
 after_success:
   # push coverage results to Coveralls
-  #- julia -e 'using Pkg; cd(Pkg.dir("Octo")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then julia -e 'using Pkg; cd(Pkg.dir("Octo")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'  ; fi
   # push coverage results to Codecov
-  #- julia -e 'using Pkg; cd(Pkg.dir("Octo")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then julia -e 'using Pkg; cd(Pkg.dir("Octo")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'      ; fi
