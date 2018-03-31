@@ -17,13 +17,13 @@ env:
   - POSTGRESQL_VERSION=9.6 PGHOST="/var/run/postgresql"
 
 before_install:
-  # PostgreSQL 9.6.6
-  - sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION
+  # linux PostgreSQL 9.6.6
+  #- sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION
   - psql --version
   - psql -U postgres -tc 'SHOW server_version'
   - psql -U postgres -c '\conninfo'
   - psql -c "CREATE DATABASE postgresqltest;" -U postgres
-  # MySQL
+  # linux MySQL
   - mysql --version
   - mysql -e 'show variables like "socket";' -uroot
   - mysql -e 'CREATE DATABASE mysqltest;' -uroot
