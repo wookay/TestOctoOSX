@@ -51,7 +51,7 @@ before_script:
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install   mysql                                                                                        ; fi
   - mysql --version
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services start mysql                                                                                   ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then find /var/* -name mysql.sock            ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then find /usr/* -name mysql.sock            ; fi
   - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql --socket="" -e 'CREATE DATABASE mysqltest;' -uroot                                                    ; fi
   - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql --socket="" -e 'GRANT ALL PRIVILEGES ON mysqltest.* TO "root"@"localhost" IDENTIFIED BY ""' -uroot    ; fi
 
