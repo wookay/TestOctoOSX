@@ -20,6 +20,7 @@ before_install:
   # linux PostgreSQL 9.6.6
   #- sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION
   # osx
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install postgresql mysql ; fi
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services stop postgresql   ; fi
   - if [ "$TRAVIS_OS_NAME" == osx ]; brew services start postgresql       ; fi
   - psql --version
@@ -58,7 +59,6 @@ git:
 before_script: # homebrew for mac
   - export OLD_PATH=$LD_LIBRARY_PATH
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`mysql_config --libs | cut -d ' ' -f1 | sed 's/-L//'`
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install postgresql mysql ; fi
 
 ## uncomment the following lines to override the default test script
 
