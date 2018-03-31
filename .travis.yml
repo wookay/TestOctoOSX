@@ -58,8 +58,7 @@ git:
 before_script: # homebrew for mac
   - export OLD_PATH=$LD_LIBRARY_PATH
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`mysql_config --libs | cut -d ' ' -f1 | sed 's/-L//'`
-#  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install mysql          ; fi
-#  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql.server start          ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then brew install postgresql mysql ; fi
 
 ## uncomment the following lines to override the default test script
 
