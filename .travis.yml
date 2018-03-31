@@ -48,6 +48,7 @@ before_script:
   #- sudo service postgresql stop && sudo service postgresql start $POSTGRESQL_VERSION
   # osx
   #- if [ "$TRAVIS_OS_NAME" == osx ]; then brew install mysql ; fi
+  - pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
   - psql --version
   - psql -c "CREATE DATABASE postgresqltest;" -U postgres
   # linux MySQL
