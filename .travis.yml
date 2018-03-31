@@ -52,8 +52,9 @@ before_script:
   - mysql --version
   - if [ "$TRAVIS_OS_NAME" == osx ]; then brew services start mysql                                                                                   ; fi
   - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql.server start                                                                                          ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql --socket="" -e 'CREATE DATABASE mysqltest;' -uroot                                                    ; fi
-  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql --socket="" -e 'GRANT ALL PRIVILEGES ON mysqltest.* TO "root"@"localhost" IDENTIFIED BY ""' -uroot    ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then sleep 0.1                                                                                                   ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql -e 'CREATE DATABASE mysqltest;' -uroot                                                    ; fi
+  - if [ "$TRAVIS_OS_NAME" == osx ]; then mysql -e 'GRANT ALL PRIVILEGES ON mysqltest.* TO "root"@"localhost" IDENTIFIED BY ""' -uroot    ; fi
 
 script:
   - julia -e 'using Pkg; Pkg.add("DataStreams"); Pkg.checkout("DataStreams", "master"); using DataStreams' # for MySQL.jl
